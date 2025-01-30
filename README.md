@@ -8,12 +8,11 @@ INSTALLATION
 
 HOW TO USE
 ----------
-1) youtube_downloader.py
-   • Description: Downloads a YouTube video (and captions, if available)\n
-   • Usage:
-       python youtube_downloader.py "YOUTUBE_URL"\n
-   • Output:
-       videos/<VIDEO_ID>/<VIDEO_ID>.mp4
+1) youtube_downloader.py \n\n
+   • Description: Downloads a YouTube video (and captions, if available) \n\n
+   • Usage: python youtube_downloader.py "YOUTUBE_URL" \n\n
+   • Output: \n\n
+       videos/<VIDEO_ID>/<VIDEO_ID>.mp4 \n\n
        videos/<VIDEO_ID>/<VIDEO_ID>_captions.json (if captions exist)
 
 2) scene_detector.py
