@@ -5,10 +5,9 @@ INSTALLATION
 3. Install required packages:
    pip install -r requirements.txt
 
-===============================================================
-HOW TO USE
-===============================================================
 
+HOW TO USE
+----------
 1) youtube_downloader.py
 ------------------------
    • Description: Downloads a YouTube video (and captions, if available).
@@ -27,9 +26,8 @@ HOW TO USE
        <video_stem>_scenes/scene_001.mp4, scene_002.mp4, ...
        <video_stem>_scenes/scene_info.json
 
-===============================================================
-WORKFLOW EXAMPLE
-===============================================================
+EXAMPLE
+-------
    1. Download the video:
       python youtube_downloader.py "https://www.youtube.com/watch?v=EXAMPLE"
    2. Detect scenes:
