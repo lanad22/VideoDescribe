@@ -1,0 +1,6 @@
+yt-dlp
+youtube_transcript_api
+scenedetect
+opencv-python
+argparse
+pathlib
