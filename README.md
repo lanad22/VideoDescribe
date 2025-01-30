@@ -9,9 +9,9 @@ INSTALLATION
 HOW TO USE
 ----------
 1) youtube_downloader.py
-   • Description: Downloads a YouTube video (and captions, if available).
+   • Description: Downloads a YouTube video (and captions, if available)\n
    • Usage:
-       python youtube_downloader.py "YOUTUBE_URL"
+       python youtube_downloader.py "YOUTUBE_URL"\n
    • Output:
        videos/<VIDEO_ID>/<VIDEO_ID>.mp4
        videos/<VIDEO_ID>/<VIDEO_ID>_captions.json (if captions exist)
