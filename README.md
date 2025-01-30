@@ -9,7 +9,6 @@ INSTALLATION
 HOW TO USE
 ----------
 1) youtube_downloader.py
-------------------------
    • Description: Downloads a YouTube video (and captions, if available).
    • Usage:
        python youtube_downloader.py "YOUTUBE_URL"
@@ -18,7 +17,6 @@ HOW TO USE
        videos/<VIDEO_ID>/<VIDEO_ID>_captions.json (if captions exist)
 
 2) scene_detector.py
---------------------
    • Description: Detects scene boundaries and splits the video into multiple .mp4 files.
    • Usage:
        python scene_detector.py <video_path> [--captions <captions_path>]
