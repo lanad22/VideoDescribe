@@ -2,10 +2,10 @@
   {
     "scene_number": 1,
     "start_frame": 0,
-    "end_frame": 188,
+    "end_frame": 478,
     "start_time": 0.0,
-    "end_time": 6.27290672510615,
-    "duration": 6.27290672510615,
+    "end_time": 15.949199013833722,
+    "duration": 15.949199013833722,
     "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_001.mp4",
     "captions": [
       "Tuna Melt Sandwich"
@@ -13,120 +13,43 @@
   },
   {
     "scene_number": 2,
-    "start_frame": 188,
-    "end_frame": 478,
-    "start_time": 6.27290672510615,
-    "end_time": 15.949199013833722,
-    "duration": 9.676292288727572,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_002.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 3,
     "start_frame": 478,
-    "end_frame": 552,
+    "end_frame": 1587,
     "start_time": 15.949199013833722,
-    "end_time": 18.41832187371593,
-    "duration": 2.469122859882207,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_003.mp4",
-    "captions": [
-      "Tomato"
-    ]
-  },
-  {
-    "scene_number": 4,
-    "start_frame": 552,
-    "end_frame": 722,
-    "start_time": 18.41832187371593,
-    "end_time": 24.0906311464183,
-    "duration": 5.672309272702371,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_004.mp4",
+    "end_time": 52.952675386933294,
+    "duration": 37.00347637309957,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_002.mp4",
     "captions": [
       "Tomato",
-      "Cut the tomatoes into 1cm thick"
-    ]
-  },
-  {
-    "scene_number": 5,
-    "start_frame": 722,
-    "end_frame": 1087,
-    "start_time": 24.0906311464183,
-    "end_time": 36.26941282016162,
-    "duration": 12.17878167374332,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_005.mp4",
-    "captions": [
+      "Cut the tomatoes into 1cm thick",
       "Cut it easily to put it on the bread",
       "Onion",
-      "Chop the onion"
-    ]
-  },
-  {
-    "scene_number": 6,
-    "start_frame": 1087,
-    "end_frame": 1168,
-    "start_time": 36.26941282016162,
-    "end_time": 38.97210135597863,
-    "duration": 2.7026885358170105,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_006.mp4",
-    "captions": [
-      "Celery (Cucumber is possible)"
-    ]
-  },
-  {
-    "scene_number": 7,
-    "start_frame": 1168,
-    "end_frame": 1464,
-    "start_time": 38.97210135597863,
-    "end_time": 48.848592795507464,
-    "duration": 9.876491439528834,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_007.mp4",
-    "captions": [
+      "Chop the onion",
       "Celery (Cucumber is possible)",
-      "Chop finely"
-    ]
-  },
-  {
-    "scene_number": 8,
-    "start_frame": 1464,
-    "end_frame": 1494,
-    "start_time": 48.848592795507464,
-    "end_time": 49.84958854951377,
-    "duration": 1.0009957540063041,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_008.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 9,
-    "start_frame": 1494,
-    "end_frame": 1587,
-    "start_time": 49.84958854951377,
-    "end_time": 52.952675386933294,
-    "duration": 3.103086837419525,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_009.mp4",
-    "captions": [
+      "Chop finely",
       "Cucumber pickles"
     ]
   },
   {
-    "scene_number": 10,
+    "scene_number": 3,
     "start_frame": 1587,
     "end_frame": 1776,
     "start_time": 52.952675386933294,
     "end_time": 59.25894863717299,
     "duration": 6.306273250239698,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_010.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_003.mp4",
     "captions": [
       "I'm bored, but keep chopping"
     ]
   },
   {
-    "scene_number": 11,
+    "scene_number": 4,
     "start_frame": 1776,
     "end_frame": 3314,
     "start_time": 59.25894863717299,
     "end_time": 110.57666429256267,
     "duration": 51.31771565538968,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_011.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_004.mp4",
     "captions": [
       "150g tuna",
       "Filter the oil",
@@ -141,250 +64,132 @@
     ]
   },
   {
-    "scene_number": 12,
+    "scene_number": 5,
     "start_frame": 3314,
-    "end_frame": 3428,
-    "start_time": 110.57666429256267,
-    "end_time": 114.3804481577866,
-    "duration": 3.8037838652239344,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_012.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 13,
-    "start_frame": 3428,
     "end_frame": 3499,
-    "start_time": 114.3804481577866,
+    "start_time": 110.57666429256267,
     "end_time": 116.74947144226819,
-    "duration": 2.3690232844815853,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_013.mp4",
+    "duration": 6.17280714970552,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_005.mp4",
     "captions": [
       "Bread for toast"
     ]
   },
   {
-    "scene_number": 14,
+    "scene_number": 6,
     "start_frame": 3499,
-    "end_frame": 3580,
-    "start_time": 116.74947144226819,
-    "end_time": 119.45215997808519,
-    "duration": 2.7026885358170034,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_014.mp4",
-    "captions": [
-      "40g melted butter"
-    ]
-  },
-  {
-    "scene_number": 15,
-    "start_frame": 3580,
     "end_frame": 3797,
-    "start_time": 119.45215997808519,
+    "start_time": 116.74947144226819,
     "end_time": 126.6926959320641,
-    "duration": 7.240535953978906,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_015.mp4",
+    "duration": 9.94322448979591,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_006.mp4",
     "captions": [
+      "40g melted butter",
       "Apply on one side of the bread"
     ]
   },
   {
-    "scene_number": 16,
+    "scene_number": 7,
     "start_frame": 3797,
     "end_frame": 3980,
     "start_time": 126.6926959320641,
     "end_time": 132.79877003150253,
     "duration": 6.10607409943843,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_016.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_007.mp4",
     "captions": [
       "This will give it a crisper and nicer brown color."
     ]
   },
   {
-    "scene_number": 17,
+    "scene_number": 8,
     "start_frame": 3980,
-    "end_frame": 4075,
-    "start_time": 132.79877003150253,
-    "end_time": 135.96858991918916,
-    "duration": 3.1698198876866286,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_017.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 18,
-    "start_frame": 4075,
-    "end_frame": 4245,
-    "start_time": 135.96858991918916,
-    "end_time": 141.64089919189152,
-    "duration": 5.672309272702364,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_018.mp4",
-    "captions": [
-      "Bake the noodles without butter"
-    ]
-  },
-  {
-    "scene_number": 19,
-    "start_frame": 4245,
     "end_frame": 4374,
-    "start_time": 141.64089919189152,
+    "start_time": 132.79877003150253,
     "end_time": 145.9451809341186,
-    "duration": 4.30428174222709,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_019.mp4",
+    "duration": 13.146410902616083,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_008.mp4",
     "captions": [
+      "Bake the noodles without butter",
       "Turn it over after checking the back shape"
     ]
   },
   {
-    "scene_number": 20,
+    "scene_number": 9,
     "start_frame": 4374,
     "end_frame": 4684,
     "start_time": 145.9451809341186,
     "end_time": 156.28880372551706,
     "duration": 10.343622791398445,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_020.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_009.mp4",
     "captions": [
       "Haha~ My heart was in a hurry, it wasn't brown",
       "But keep going"
     ]
   },
   {
-    "scene_number": 21,
+    "scene_number": 10,
     "start_frame": 4684,
-    "end_frame": 4812,
+    "end_frame": 5120,
     "start_time": 156.28880372551706,
-    "end_time": 160.5597189426106,
-    "duration": 4.270915217093545,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_021.mp4",
+    "end_time": 170.83660868374196,
+    "duration": 14.547804958224901,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_010.mp4",
     "captions": [
       "But keep going",
-      "2 pieces of cheddar cheese"
-    ]
-  },
-  {
-    "scene_number": 22,
-    "start_frame": 4812,
-    "end_frame": 5028,
-    "start_time": 160.5597189426106,
-    "end_time": 167.76688837145596,
-    "duration": 7.207169428845361,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_022.mp4",
-    "captions": [
+      "2 pieces of cheddar cheese",
       "2tbsp of tuna sauce",
-      "Spread it flat like a blanket"
-    ]
-  },
-  {
-    "scene_number": 23,
-    "start_frame": 5028,
-    "end_frame": 5120,
-    "start_time": 167.76688837145596,
-    "end_time": 170.83660868374196,
-    "duration": 3.0697203122859946,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_023.mp4",
-    "captions": [
+      "Spread it flat like a blanket",
       "Ready to greet guests"
     ]
   },
   {
-    "scene_number": 24,
+    "scene_number": 11,
     "start_frame": 5120,
     "end_frame": 5279,
     "start_time": 170.83660868374196,
     "end_time": 176.14188617997536,
     "duration": 5.305277496233401,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_024.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_011.mp4",
     "captions": [
       "2 slices of tomatoes lay down"
     ]
   },
   {
-    "scene_number": 25,
+    "scene_number": 12,
     "start_frame": 5279,
     "end_frame": 5469,
     "start_time": 176.14188617997536,
     "end_time": 182.4815259553486,
     "duration": 6.339639775373229,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_025.mp4",
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_012.mp4",
     "captions": [
       "Cover the cheese bread"
     ]
   },
   {
-    "scene_number": 26,
+    "scene_number": 13,
     "start_frame": 5469,
-    "end_frame": 5538,
+    "end_frame": 6136,
     "start_time": 182.4815259553486,
-    "end_time": 184.78381618956308,
-    "duration": 2.302290234214496,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_026.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 27,
-    "start_frame": 5538,
-    "end_frame": 5810,
-    "start_time": 184.78381618956308,
-    "end_time": 193.85951102588686,
-    "duration": 9.075694836323777,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_027.mp4",
+    "end_time": 204.736998219422,
+    "duration": 22.255472264073404,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_013.mp4",
     "captions": [
-      "The crispness is felt by the knife"
-    ]
-  },
-  {
-    "scene_number": 28,
-    "start_frame": 5810,
-    "end_frame": 6025,
-    "start_time": 193.85951102588686,
-    "end_time": 201.03331392959868,
-    "duration": 7.173802903711817,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_028.mp4",
-    "captions": [
+      "The crispness is felt by the knife",
       "I want to see you even if I see you"
     ]
   },
   {
-    "scene_number": 29,
-    "start_frame": 6025,
-    "end_frame": 6133,
-    "start_time": 201.03331392959868,
-    "end_time": 204.63689864402136,
-    "duration": 3.6035847144226807,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_029.mp4",
-    "captions": []
-  },
-  {
-    "scene_number": 30,
-    "start_frame": 6133,
-    "end_frame": 6284,
-    "start_time": 204.63689864402136,
-    "end_time": 209.6752439391864,
-    "duration": 5.038345295165044,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_030.mp4",
-    "captions": [
-      "It\u2019s delicious just by looking at it, let\u2019s stick with me one-on-one"
-    ]
-  },
-  {
-    "scene_number": 31,
-    "start_frame": 6284,
-    "end_frame": 6537,
-    "start_time": 209.6752439391864,
-    "end_time": 218.1169747979729,
-    "duration": 8.441730858786485,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_031.mp4",
+    "scene_number": 14,
+    "start_frame": 6136,
+    "end_frame": 7301,
+    "start_time": 204.736998219422,
+    "end_time": 243.609,
+    "duration": 38.87200178057802,
+    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_014.mp4",
     "captions": [
       "It\u2019s delicious just by looking at it, let\u2019s stick with me one-on-one",
-      "Wow~ The state of this crunchy"
-    ]
-  },
-  {
-    "scene_number": 32,
-    "start_frame": 6537,
-    "end_frame": 7301,
-    "start_time": 218.1169747979729,
-    "end_time": 243.609,
-    "duration": 25.492025202027122,
-    "video_path": "videos/rlOywSJnPOU/rlOywSJnPOU_scenes/scene_032.mp4",
-    "captions": [
+      "Wow~ The state of this crunchy",
       "The history of delicious tuna is carved into the stomach.",
       "I'm full, but I want to eat again",
       "Taste beyond imagination..., don't hold back and keep eating"
