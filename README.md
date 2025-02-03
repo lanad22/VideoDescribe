@@ -1,9 +1,14 @@
 INSTALLATION
 ------------
 
-1. Ensure you have Python 3.7+ installed.  
+1. Create and activate conda environment:  
 
-2. (Optional) Create/activate a virtual environment.  
+   conda create -n video_env python=3.9  
+   conda activate video_env  
+
+2. Install FFmpeg:  
+
+   conda install ffmpeg -c conda-forge  
 
 3. Install required packages:  
 
@@ -28,19 +33,30 @@ HOW TO USE
        videos/<VIDEO_ID>/<VIDEO_ID>_captions.json (if captions exist)  
 
 
-2) scene_detector.py  
+2) video_processor.py  
 
-   • Description: Detects scene boundaries and splits the video into multiple .mp4 files.  
+   • Description: Detects scenes, transcribes speech, and prepares videos for Qwen.  
 
    • Usage:  
 
-       python scene_detector.py <video_path> [--captions <captions_path>]  
+       python video_processor.py <video_path> \  
+           [--whisper-model <model>] \  
+           [--captions <captions_path>] \  
+           [--min-duration <seconds>]  
+
+   • Arguments:  
+
+       --whisper-model: Whisper model size (tiny/base/small/medium/large, default: base)  
+       --captions: Path to captions file (optional)  
+       --min-duration: Minimum scene duration in seconds (default: 5.0)  
 
    • Output:  
 
-       <video_stem>_scenes/scene_001.mp4, scene_002.mp4, ...  
-
-       <video_stem>_scenes/scene_info.json  
+       <video_stem>_scenes/scene_001.mp4      # Qwen-compatible video  
+       <video_stem>_scenes/scene_001.txt      # Audio transcript (if speech detected)  
+       <video_stem>_scenes/scene_002.mp4  
+       <video_stem>_scenes/scene_002.txt  
+       <video_stem>_scenes/scene_info.json    # Scene metadata  
 
 
 EXAMPLE
@@ -50,7 +66,8 @@ EXAMPLE
 
    python youtube_downloader.py "https://www.youtube.com/watch?v=EXAMPLE"  
 
-2. Detect scenes:  
+2. Process video:  
 
-   python scene_detector.py videos/EXAMPLE/EXAMPLE.mp4 \  
-      --captions videos/EXAMPLE/EXAMPLE_captions.json  
+   python video_processor.py videos/EXAMPLE/EXAMPLE.mp4 \  
+      --whisper-model base \  
+      --captions videos/EXAMPLE/EXAMPLE_captions.json
