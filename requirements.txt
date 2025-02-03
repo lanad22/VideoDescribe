@@ -4,3 +4,5 @@ scenedetect
 opencv-python
 argparse
 pathlib
+transformers
+git+https://github.com/openai/whisper.git 
