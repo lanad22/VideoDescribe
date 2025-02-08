@@ -1,73 +1,90 @@
-import sys
-import argparse
-import streamlit as st
+import os
 import cv2
 import torch
+from flask import Flask, render_template, jsonify, request, send_from_directory
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 from PIL import Image
-import os
 
-# Parse command-line arguments (using parse_known_args to allow Streamlit's own args)
-parser = argparse.ArgumentParser()
-parser.add_argument("--video_path", type=str, help="Path to the video file")
-args, _ = parser.parse_known_args()
-video_path_arg = args.video_path if args.video_path else ""
+# ***** Load AI Model *****
+print("Loading model... (this may take a while)")
+model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+    "Qwen/Qwen2.5-VL-7B-Instruct", torch_dtype=torch.float16, device_map="auto"
+)
+processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
+print("Model loaded.")
 
-# Load the Qwen2.5-VL model and processor (cached so they load only once)
-@st.cache_resource
-def load_model():
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        "Qwen/Qwen2.5-VL-7B-Instruct", torch_dtype="auto", device_map="auto"
-    )
-    processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
-    return model, processor
+# Flask App Setup
+app = Flask(__name__)
 
-model, processor = load_model()
+VIDEO_PATH = "/home/do.ng/VideoDescribe/videos/n9nC8liwZ5Y/n9nC8liwZ5Y_scenes/scene_002.mp4"
 
-st.title("Local Video Q&A with Qwen2.5-VL")
+# ***** Serve Video from Local Directory *****
+@app.route("/video")
+def serve_video():
+    if not os.path.exists(VIDEO_PATH):
+        return "Error: Video file not found.", 404
+    return send_from_directory(os.path.dirname(VIDEO_PATH), os.path.basename(VIDEO_PATH))
 
-# Use the command-line argument (if provided) as the default value for the text input
-video_path = st.text_input("Enter the path to your video file:", value=video_path_arg)
+# ***** Extract a Frame at Given Timestamp *****
+def extract_frame(video_path, timestamp):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        return None, "Error: Cannot open video file."
 
-if video_path:
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if fps == 0:
+        return None, "Error: FPS is 0, video may be corrupted."
+
+    target_frame = int(timestamp * fps)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
+    ret, frame = cap.read()
+    cap.release()
+
+    if ret:
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(frame_rgb)
+
+        # Resize if too large
+        max_size = 800
+        width, height = image.size
+        if max(width, height) > max_size:
+            scaling_factor = max_size / max(width, height)
+            new_size = (int(width * scaling_factor), int(height * scaling_factor))
+            image = image.resize(new_size, Image.ANTIALIAS)
+        
+        return image, None
+    else:
+        return None, "Error: Could not extract frame at the given timestamp."
+
+# ***** API Route to Process Frame and Generate Caption *****
+@app.route("/process", methods=["POST"])
+def process_frame():
+    data = request.json
+    timestamp = data.get("timestamp")
+    question = data.get("question", "Describe this image.")
+
+    if timestamp is None:
+        return jsonify({"error": "Missing timestamp"}), 400
+
+    frame, error = extract_frame(VIDEO_PATH, timestamp)
+    if error:
+        return jsonify({"error": error}), 500
+
+    torch.cuda.empty_cache()  # Free GPU memory
+
     try:
-        # Display the video by reading its bytes and using Streamlit's video component
-        with open(video_path, "rb") as video_file:
-            video_bytes = video_file.read()
-        st.video(video_bytes)
+        inputs = processor(images=frame, text=question, return_tensors="pt").to(model.device)
+        outputs = model.generate(**inputs)
+        answer = processor.batch_decode(outputs, skip_special_tokens=True)[0]
+        return jsonify({"answer": answer})
     except Exception as e:
-        st.error(f"Error loading video: {e}")
+        return jsonify({"error": str(e)}), 500
 
-    st.write("Play the video and pause at the moment you want to ask a question. Then, note the timestamp (in seconds) and enter your question below:")
+# ***** Route to Render UI *****
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-    # Get timestamp and question from the user
-    timestamp = st.number_input("Enter the timestamp (in seconds):", min_value=0, value=0, step=1)
-    question = st.text_input("Enter your question:")
-
-    if st.button("Ask Question") and question:
-        st.write("Processing video... This may take a moment.")
-        try:
-            # Open the video file and calculate the frame corresponding to the timestamp
-            cap = cv2.VideoCapture(video_path)
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            target_frame = int(timestamp * fps)
-            cap.set(cv2.CAP_PROP_POS_FRAMES, target_frame)
-            ret, frame = cap.read()
-            if not ret:
-                st.error("Could not extract frame at the given timestamp.")
-            else:
-                # Convert the frame from BGR (OpenCV format) to RGB
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                image = Image.fromarray(frame_rgb)
-                st.image(image, caption=f"Frame at {timestamp} seconds")
-                
-                # Process the image and the user question using the Qwen2.5-VL model
-                inputs = processor(images=image, text=question, return_tensors="pt").to(model.device)
-                outputs = model.generate(**inputs)
-                answer = processor.batch_decode(outputs, skip_special_tokens=True)[0]
-                
-                st.write("Answer:")
-                st.write(answer)
-            cap.release()
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+# Run Flask App
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -5,6 +5,10 @@ opencv-python
 argparse
 pathlib
 transformers
-streamlit
+flask
+pillow 
+torch 
+torchvision 
+torchaudio
 git+https://github.com/openai/whisper.git 
 qwen-vl-utils[decord]==0.0.8

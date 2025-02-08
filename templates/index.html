@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Frame Analysis</title>
+</head>
+<body>
+    <h2>Video Player</h2>
+    <video id="videoPlayer" width="640" controls>
+        <source src="/video" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <h2>Ask a Question About a Frame</h2>
+    <label for="question">Question:</label>
+    <input type="text" id="question" placeholder="What is happening in this scene?">
+
+    <button onclick="processFrame()">Ask AI</button>
+
+    <h3>Generated Answer:</h3>
+    <p id="answer"></p>
+
+    <script>
+        function processFrame() {
+            var video = document.getElementById("videoPlayer");
+            var timestamp = video.currentTime;  // Get current playback time
+            var question = document.getElementById("question").value;
+
+            fetch("/process", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ timestamp: timestamp, question: question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("answer").innerText = "Error: " + data.error;
+                } else {
+                    document.getElementById("answer").innerText = data.answer;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
