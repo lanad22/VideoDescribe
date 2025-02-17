@@ -4,11 +4,11 @@ scenedetect
 opencv-python
 argparse
 pathlib
-transformers
+git+https://github.com/huggingface/transformers 
+accelerate
 flask
+flash-attn --no-build-isolation
 pillow 
-torch 
-torchvision 
-torchaudio
-git+https://github.com/openai/whisper.git 
-qwen-vl-utils[decord]==0.0.8
+qwen-vl-utils[decord]
+pydub
+whisper-ctranslate2
