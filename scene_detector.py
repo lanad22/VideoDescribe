@@ -12,8 +12,10 @@ class SceneDetector:
         self.min_scene_duration = min_scene_duration
         self.detector = None
 
-    def extract_scene(self, video_path: str, start_frame: int, end_frame: int, output_path: str):
+    def extract_scene(self, video_folder: str, start_frame: int, end_frame: int, output_path: str):
         """Extract scene."""
+        video_id = os.path.basename(video_folder)
+        video_path = os.path.join(video_folder, f"{video_id}.mp4")
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         cap.release()
@@ -61,22 +63,32 @@ class SceneDetector:
             print(f"Error during conversion:", e.stderr.decode())
             raise
 
-    def detect_scenes(self, video_path: str, captions_path: Optional[str] = None) -> str:
-        """Detect scenes and save scene information."""
+    def detect_scenes(self, video_folder: str, captions_path: Optional[str] = None) -> str:
+        video_id = os.path.basename(video_folder)
+        video_path = os.path.join(video_folder, f"{video_id}.mp4")
         print(f"Processing video: {video_path}")
 
         # Get video_id and create scenes directory
-        video_id = os.path.basename(os.path.dirname(video_path))
-        video_dir = os.path.dirname(video_path)
-        scenes_dir = os.path.join(video_dir, f"{video_id}_scenes")
+        video_id = os.path.basename(video_folder)
+        #video_dir = os.path.dirname(video_path)
+        scenes_dir = os.path.join(video_folder, f"{video_id}_scenes")
         os.makedirs(scenes_dir, exist_ok=True)
 
         # Load captions if available
         captions = None
+        
+        #video_id.json 
+        caption_path = os.path.join(video_folder, f"{video_id}.json")
         if captions_path and os.path.exists(captions_path):
             print("Loading captions...")
             with open(captions_path, 'r') as f:
-                captions = json.load(f)
+                captions_data = json.load(f)
+            
+            # Only process captions if the 'captions' field exists and is not empty
+            if "captions" in captions_data and captions_data["captions"]:
+                captions = captions_data["captions"]
+            else:
+                print("No captions found in the JSON file.")
 
         # Initialize scene detection
         cap = cv2.VideoCapture(video_path)
@@ -84,7 +96,7 @@ class SceneDetector:
         cap.release()
 
         min_scene_frames = int(self.min_scene_duration * fps)
-        self.detector = ContentDetector(threshold=25.0, min_scene_len=min_scene_frames)
+        self.detector = ContentDetector(threshold=32.0, min_scene_len=min_scene_frames)
 
         print("Detecting scenes...")
         scene_list = detect(video_path, self.detector)
@@ -105,7 +117,7 @@ class SceneDetector:
             scene_path = os.path.join(scenes_dir, f"scene_{i+1:03d}.mp4")
             temp_path = scene_path + ".temp.mp4"
             
-            self.extract_scene(video_path, start_frame, end_frame, temp_path)
+            self.extract_scene(video_folder, start_frame, end_frame, temp_path)
             self.convert_for_qwen(temp_path, scene_path)
             os.remove(temp_path)
 
@@ -116,7 +128,7 @@ class SceneDetector:
                 'start_time': start_time,
                 'end_time': end_time,
                 'duration': duration,
-                'video_path': scene_path
+                'scene_path': scene_path
             }
 
             # Add captions if available
@@ -146,16 +158,19 @@ class SceneDetector:
 
         return info_path
 
-    def match_transcripts_to_scenes(self, video_path: str) -> None:
+    def match_transcripts_to_scenes(self, video_folder: str) -> None:
         """Match transcribed segments to scenes."""
         print("\nMatching transcripts to scenes...")
         
         # Get paths based on video directory
-        video_id = os.path.basename(os.path.dirname(video_path))
-        video_dir = os.path.dirname(video_path)
-        scenes_dir = os.path.join(video_dir, f"{video_id}_scenes")
+        #video_id = os.path.basename(os.path.dirname(video_path))
+        #video_dir = os.path.dirname(video_path)
         
-        transcript_path = os.path.join(video_dir, "transcript.json")
+        video_id = os.path.basename(video_folder)
+        video_path = os.path.join(video_folder, f"{video_id}.mp4")
+        scenes_dir = os.path.join(video_folder, f"{video_id}_scenes")
+        
+        transcript_path = os.path.join(video_folder, "transcript.json")
         scene_info_path = os.path.join(scenes_dir, "scene_info.json")
         
         # Check if required files exist
@@ -206,22 +221,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Detect scenes and match with transcripts"
     )
-    parser.add_argument("video_path", 
-                        help="Path to the input video file (format: videos/video_id/video_id.mp4)")
-    parser.add_argument("--captions",
-                        help="Path to the captions file (optional)",
-                        default=None)
+    #parser.add_argument("video_path", help="Path to the input video file (format: videos/video_id/video_id.mp4)")
+    
+    parser.add_argument("video_folder", type=str,
+                        help="Folder containing files associated video files.")
     parser.add_argument("--min-duration",
                         type=float,
-                        default=7.0,
-                        help="Minimum scene duration in seconds (default: 7.0)")
+                        default=5.0,
+                        help="Minimum scene duration in seconds (default: 5.0)")
     args = parser.parse_args()
 
     # Initialize and run scene detection
     detector = SceneDetector(min_scene_duration=args.min_duration)
     
     # First detect scenes
-    detector.detect_scenes(args.video_path, args.captions)
+    detector.detect_scenes(args.video_folder)
     
     # Then match with transcripts
-    detector.match_transcripts_to_scenes(args.video_path)
+    detector.match_transcripts_to_scenes(args.video_folder)

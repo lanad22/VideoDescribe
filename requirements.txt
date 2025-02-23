@@ -6,9 +6,9 @@ argparse
 pathlib
 git+https://github.com/huggingface/transformers 
 accelerate
-flask
 flash-attn --no-build-isolation
 pillow 
 qwen-vl-utils[decord]
 pydub
 whisper-ctranslate2
+gTTS
