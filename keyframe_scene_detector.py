@@ -2,77 +2,194 @@ import os
 import argparse
 import json
 import subprocess
-import numpy as np
-import cv2
-from decord import VideoReader, cpu
+import glob
+import shutil
 
-def extract_keyframes(video_path):
+import numpy as np
+import torch
+import clip
+from PIL import Image
+
+def get_video_info(video_path):
     """
-    Extract only keyframe indices from the video using decord.
+    Use ffprobe to get the video's FPS and total frame count.
     """
-    print(f"Extracting keyframes from {video_path}")
+    # Get FPS
+    cmd = [
+        "ffprobe", "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=r_frame_rate",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        video_path
+    ]
+    fps_output = subprocess.check_output(cmd).decode().strip()
+    num, den = fps_output.split('/')
+    fps = float(num) / float(den)
+    
+    # Get total frame count
+    cmd2 = [
+        "ffprobe", "-v", "error",
+        "-select_streams", "v:0",
+        "-count_frames",
+        "-show_entries", "stream=nb_read_frames",
+        "-of", "default=noprint_wrappers=1:nokey=1",
+        video_path
+    ]
+    total_frames_str = subprocess.check_output(cmd2).decode().strip()
     try:
-        # Single-threaded decoding to resolve the packet sending error
-        vr = VideoReader(video_path, ctx=cpu(0), num_threads=1)
-        total_frames = len(vr)
-        print(f"Total frames: {total_frames} frames")
-        
-        # Get keyframe indices - the only thing we actually need
-        keyframe_indices = vr.get_key_indices()
-        print(f"Found {len(keyframe_indices)} keyframe indices")
-        
-        return keyframe_indices, total_frames
+        total_frames = int(total_frames_str)
     except Exception as e:
-        print(f"Error extracting keyframes: {str(e)}")
-        return [], 0
+        print(f"Error parsing total frames: {e}")
+        total_frames = None
+    return fps, total_frames
+
+def extract_frames_ffmpeg(video_path, output_folder, sample_rate=1):
+    """
+    Use ffmpeg to extract frames from the video into output_folder.
+    Only every nth frame is extracted (controlled by sample_rate).
+    
+    Returns:
+      A sorted list of frame file paths.
+    """
+    os.makedirs(output_folder, exist_ok=True)
+    # Build the ffmpeg command. The filter selects every nth frame.
+    command = [
+        "ffmpeg", "-i", video_path,
+        "-vf", f"select='not(mod(n\\,{sample_rate}))'",
+        "-vsync", "vfr",
+        os.path.join(output_folder, "frame_%06d.jpg")
+    ]
+    try:
+        subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print(f"Error extracting frames: {e.stderr.decode()}")
+        return []
+    
+    frame_files = sorted(glob.glob(os.path.join(output_folder, "frame_*.jpg")))
+    print(f"Extracted {len(frame_files)} frames to {output_folder}")
+    return frame_files
+
+def extract_keyframes_clip(video_path, device="cuda", sample_rate=1, similarity_threshold=0.85):
+    """
+    Extract keyframe indices using CLIP to detect semantic changes between frames.
+    Frames are extracted using ffmpeg.
+    
+    Args:
+      video_path (str): Path to the video file.
+      device (str): Device to use for inference ('cuda' or 'cpu').
+      sample_rate (int): Extract every nth frame.
+      similarity_threshold (float): Cosine similarity threshold below which a frame is marked as keyframe.
+    
+    Returns:
+      tuple: (keyframe_indices, total_frames)
+        - keyframe_indices: list of original frame indices that are considered keyframes.
+        - total_frames: total number of frames in the video.
+    """
+    print(f"Extracting keyframes using CLIP from {video_path}")
+    fps, total_frames = get_video_info(video_path)
+    print(f"Video FPS: {fps:.2f}, Total frames: {total_frames}")
+    
+    # Create a temporary folder for extracted frames.
+    temp_frames_folder = os.path.join(os.path.dirname(video_path), "extracted_frames_temp")
+    frame_files = extract_frames_ffmpeg(video_path, temp_frames_folder, sample_rate=sample_rate)
+    if not frame_files:
+        print("No frames extracted. Exiting keyframe extraction.")
+        return [], total_frames
+
+    # Load CLIP model and preprocessing pipeline.
+    model, preprocess = clip.load("ViT-B/32", device=device)
+    model.eval()
+
+    keyframe_indices = []
+    prev_embedding = None
+    # Iterate over the extracted frames.
+    for i, frame_file in enumerate(frame_files):
+        try:
+            image = Image.open(frame_file).convert("RGB")
+        except Exception as e:
+            print(f"Error opening frame {frame_file}: {e}")
+            continue
+        
+        image_input = preprocess(image).unsqueeze(0).to(device)
+        with torch.no_grad():
+            embedding = model.encode_image(image_input)
+            embedding = embedding / embedding.norm(dim=-1, keepdim=True)
+        
+        # Map the extracted frame to the original video frame index.
+        # Since frames are extracted every 'sample_rate' frames, original_index = i * sample_rate.
+        original_index = i * sample_rate
+        
+        if prev_embedding is not None:
+            cosine_sim = torch.nn.functional.cosine_similarity(embedding, prev_embedding).item()
+            if cosine_sim < similarity_threshold:
+                keyframe_indices.append(original_index)
+        else:
+            # Always treat the first frame as a keyframe.
+            keyframe_indices.append(original_index)
+        
+        prev_embedding = embedding
+
+    print(f"Found {len(keyframe_indices)} keyframe indices out of {total_frames} frames")
+    
+    # Optionally, remove the temporary frames folder after processing.
+    shutil.rmtree(temp_frames_folder)
+    
+    return keyframe_indices, total_frames
 
 def segment_video_indices(keyframe_indices, total_frames):
     """
     Create a list of (start_frame, end_frame) pairs for each segment.
-    Each segment goes from one keyframe to one frame before the next.
+    Each segment spans from one keyframe up to the frame before the next keyframe.
     """
     segments = []
     for i in range(len(keyframe_indices) - 1):
         start = keyframe_indices[i]
-        end = keyframe_indices[i+1] - 1  # end at the frame before next keyframe
+        end = keyframe_indices[i+1] - 1  # End at the frame before the next keyframe.
         segments.append((start, end))
     if keyframe_indices and keyframe_indices[-1] < total_frames:
         segments.append((keyframe_indices[-1], total_frames - 1))
     print(f"Segmented video into {len(segments)} segments (by frame indices)")
     return segments
 
-def combine_segments(segments, group_size, target_duration, fps):
-    combined = []
-    num_segments = len(segments)
-    i = 0
-    while i < num_segments:
-        # For the last group, which may not be full:
-        if i + group_size >= num_segments:
-            group = segments[i:num_segments]
-            start = group[0][0]
-            end = group[-1][1]
-            duration = (end - start + 1) / fps  # calculate duration in seconds
-            # If the duration is too short and we already have a previous group, merge them.
-            if duration < 0.5 * target_duration and combined:
-                prev_start, prev_end = combined.pop()
-                new_start = prev_start
-                new_end = end
-                combined.append((new_start, new_end))
-            else:
-                combined.append((start, end))
-            break
+def merge_short_segments(segments, fps, min_duration=10.0):
+    """
+    Merge adjacent segments until each segment's duration is at least min_duration seconds.
+    
+    Args:
+      segments (list of tuples): List of (start_frame, end_frame) segments.
+      fps (float): Frames per second of the video.
+      min_duration (float): Minimum required duration for each segment in seconds.
+    
+    Returns:
+      List of merged segments.
+    """
+    if not segments:
+        return segments
+
+    merged = []
+    current_seg = segments[0]
+    
+    for next_seg in segments[1:]:
+        current_duration = (current_seg[1] - current_seg[0] + 1) / fps
+        if current_duration < min_duration:
+            # Merge with the next segment.
+            current_seg = (current_seg[0], next_seg[1])
         else:
-            group = segments[i:i+group_size]
-            start = group[0][0]
-            end = group[-1][1]
-            combined.append((start, end))
-            i += group_size
-    print(f"Combined segments into {len(combined)} segments using group size {group_size}")
-    return combined
+            merged.append(current_seg)
+            current_seg = next_seg
+
+    # Merge the last segment if it is too short.
+    current_duration = (current_seg[1] - current_seg[0] + 1) / fps
+    if current_duration < min_duration and merged:
+        prev_seg = merged.pop()
+        current_seg = (prev_seg[0], current_seg[1])
+    merged.append(current_seg)
+    print(f"Merged segments into {len(merged)} segments (each at least {min_duration}s long)")
+    return merged
 
 def extract_video_segment_ffmpeg(video_path, start_time, end_time, output_path):
     """
-    Use ffmpeg to extract a segment from the original video (with audio).
+    Use ffmpeg to extract a video segment (with audio) from the original video.
     Uses stream copy to avoid re-encoding.
     """
     duration = end_time - start_time
@@ -90,14 +207,15 @@ def extract_video_segment_ffmpeg(video_path, start_time, end_time, output_path):
     except subprocess.CalledProcessError as e:
         print(f"Error extracting segment: {e.stderr.decode()}")
 
-def process_video(video_folder, target_duration, device="cuda"):
+def process_video(video_folder, target_duration, device="cuda", sample_rate=1,
+                  similarity_threshold=0.85, min_duration=10.0):
     """
-    Process the video using keyframe-based segmentation to define scenes.
+    Process the video using CLIP-based keyframe segmentation.
     For each scene:
-      1. Determine scene boundaries (via keyframe segmentation, optionally combined to ~target_duration seconds).
-      2. Extract the original scene (with audio) using ffmpeg.
-      3. If a captions JSON file exists, match overlapping captions.
-      4. Save scene information (including boundaries, file paths, and captions) to a JSON file.
+      1. Determine scene boundaries based on CLIP keyframes.
+      2. Merge adjacent segments that are shorter than min_duration seconds.
+      3. Extract the corresponding scene (with audio) using ffmpeg.
+      4. Save scene information to a JSON file.
     """
     video_id = os.path.basename(os.path.normpath(video_folder))
     video_path = os.path.join(video_folder, f"{video_id}.mp4")
@@ -106,54 +224,41 @@ def process_video(video_folder, target_duration, device="cuda"):
     
     print(f"Processing video: {video_path}")
     
-    # Extract keyframes and all frames
-    keyframe_indices, total_frames = extract_keyframes(video_path)
+    # Extract keyframes using CLIP with ffmpeg-based frame extraction.
+    keyframe_indices, total_frames = extract_keyframes_clip(
+        video_path, device=device, sample_rate=sample_rate, similarity_threshold=similarity_threshold
+    )
     if not keyframe_indices or not total_frames:
         print("Failed to extract keyframes/frames. Exiting.")
         return
+
+    # Retrieve FPS and total duration.
+    fps, _ = get_video_info(video_path)
+    total_duration = total_frames / fps
+    print(f"Video duration: {total_duration:.2f}s, FPS: {fps:.2f}")
     
-    # Get FPS and total duration
-    try:
-        vr_temp = VideoReader(video_path, ctx=cpu(0))
-        fps = vr_temp.get_avg_fps()
-        total_duration = total_frames / fps
-        print(f"Video duration: {total_duration:.2f}s, FPS: {fps:.2f}")
-    except Exception as e:
-        print(f"Error computing video duration: {str(e)}")
-        fps = 30.0
-        total_duration = total_frames / fps
-    
-    # Segment the video using keyframe indices
+    # Segment the video based on keyframe indices.
     segments = segment_video_indices(keyframe_indices, total_frames)
     
-    # Compute average segment duration and determine group size to reach ~target_duration seconds
-    if segments:
-        avg_seg_duration = total_duration / len(segments)
-        group_size = max(1, int(round(target_duration / avg_seg_duration)))
-        print(f"Average segment duration: {avg_seg_duration:.2f}s, grouping segments with group size: {group_size}")
-    else:
-        group_size = 1
-    
-    if group_size > 1:
-        segments = combine_segments(segments, group_size, target_duration, fps)
+    # Merge segments that are shorter than the minimum required duration.
+    segments = merge_short_segments(segments, fps, min_duration=min_duration)
     
     scene_info = []
     
-    # Process each scene
+    # Process and extract each scene.
     for i, (start_frame, end_frame) in enumerate(segments):
         start_time = start_frame / fps
-        end_time = (end_frame + 1) / fps  # include last frame
+        # For a clear cut, use the end_frame time directly.
+        end_time = (end_frame / fps) if i < len(segments) - 1 else (total_frames / fps)
         duration = end_time - start_time
         scene_filename = f"scene_{i+1:03d}.mp4"
         scene_path = os.path.join(scenes_dir, scene_filename)
         
         print(f"\nScene {i+1}: frames {start_frame} to {end_frame}, time {start_time:.2f}s to {end_time:.2f}s (duration: {duration:.2f}s)")
         
-        # Extract original scene (with audio)
+        # Extract the scene (with audio) using ffmpeg.
         extract_video_segment_ffmpeg(video_path, start_time, end_time, scene_path)
         
-        
-        # Build scene info dictionary
         scene_dict = {
             "scene_number": i + 1,
             "start_frame": start_frame,
@@ -163,10 +268,9 @@ def process_video(video_folder, target_duration, device="cuda"):
             "duration": duration,
             "scene_path": scene_path
         }
-        
         scene_info.append(scene_dict)
     
-    # Save scene information to JSON
+    # Save scene information to JSON.
     json_path = os.path.join(scenes_dir, "scene_info.json")
     with open(json_path, "w") as jf:
         json.dump(scene_info, jf, indent=2)
@@ -174,15 +278,23 @@ def process_video(video_folder, target_duration, device="cuda"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Detect scenes from a video using keyframe segmentation, extract original segments (with audio), "
-                    "and save scene information (including captions if available) to a JSON file."
+        description="Detect scenes from a video using CLIP-based keyframe segmentation with ffmpeg frame extraction, "
+                    "merge scenes shorter than a minimum duration (default: 10s), extract original segments (with audio), "
+                    "and save scene information to a JSON file."
     )
     parser.add_argument("video_folder", type=str,
                         help="Path to the video folder (e.g., videos/video_id). The video file must be named video_id.mp4")
-    parser.add_argument("--target_duration", type=float, default=20.0,
-                        help="Desired duration (in seconds) for each scene (default: 20s)")
+    parser.add_argument("--target_duration", type=float, default=10.0,
+                        help="Desired duration (in seconds) for each scene (used for grouping, default: 10s)")
     parser.add_argument("--device", type=str, default="cuda",
                         help="Device to run processing (default: cuda)")
+    parser.add_argument("--sample_rate", type=int, default=1,
+                        help="Extract every nth frame for keyframe detection (default: 1, i.e., every frame)")
+    parser.add_argument("--similarity_threshold", type=float, default=0.90,
+                        help="Cosine similarity threshold for keyframe detection (default: 0.90)")
+    parser.add_argument("--min_duration", type=float, default=10.0,
+                        help="Minimum duration (in seconds) for each scene (default: 10s)")
     
     args = parser.parse_args()
-    process_video(args.video_folder, args.target_duration, args.device)
+    process_video(args.video_folder, args.target_duration, args.device,
+                  args.sample_rate, args.similarity_threshold, args.min_duration)
