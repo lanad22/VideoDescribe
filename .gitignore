@@ -1,2 +1,8 @@
-videos/
-.cache/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+*.log
+*.txt
+!requirements.txt
+google_credentials.json

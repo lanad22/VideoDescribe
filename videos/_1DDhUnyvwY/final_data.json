@@ -1,0 +1,280 @@
+{
+  "dialogue_timestamps": [
+    {
+      "start_time": 28.37,
+      "end_time": 31.69,
+      "duration": 3.32,
+      "sequence_num": 1
+    },
+    {
+      "start_time": 31.88,
+      "end_time": 38.8,
+      "duration": 6.92,
+      "sequence_num": 2
+    },
+    {
+      "start_time": 38.8,
+      "end_time": 45.42,
+      "duration": 6.62,
+      "sequence_num": 3
+    },
+    {
+      "start_time": 45.42,
+      "end_time": 49.54,
+      "duration": 4.12,
+      "sequence_num": 4
+    },
+    {
+      "start_time": 54.89,
+      "end_time": 58.269999999999996,
+      "duration": 3.38,
+      "sequence_num": 5
+    },
+    {
+      "start_time": 72.00999999999999,
+      "end_time": 74.66999999999999,
+      "duration": 2.66,
+      "sequence_num": 6
+    },
+    {
+      "start_time": 75.03,
+      "end_time": 78.53,
+      "duration": 3.5,
+      "sequence_num": 7
+    },
+    {
+      "start_time": 79.08,
+      "end_time": 85.82,
+      "duration": 6.74,
+      "sequence_num": 8
+    },
+    {
+      "start_time": 85.82,
+      "end_time": 88.88,
+      "duration": 3.06,
+      "sequence_num": 9
+    },
+    {
+      "start_time": 95.82,
+      "end_time": 104.1,
+      "duration": 8.28,
+      "sequence_num": 10
+    },
+    {
+      "start_time": 109.42999999999999,
+      "end_time": 116.03,
+      "duration": 6.6,
+      "sequence_num": 11
+    },
+    {
+      "start_time": 121.73,
+      "end_time": 127.87,
+      "duration": 6.14,
+      "sequence_num": 12
+    },
+    {
+      "start_time": 128.08,
+      "end_time": 129.88000000000002,
+      "duration": 1.8,
+      "sequence_num": 13
+    },
+    {
+      "start_time": 130.66000000000003,
+      "end_time": 133.86,
+      "duration": 3.2,
+      "sequence_num": 14
+    },
+    {
+      "start_time": 134.88000000000002,
+      "end_time": 136.29000000000002,
+      "duration": 1.41,
+      "sequence_num": 15
+    },
+    {
+      "start_time": 138.4,
+      "end_time": 140.12,
+      "duration": 1.72,
+      "sequence_num": 16
+    }
+  ],
+  "audio_clips": [
+    {
+      "scene_number": 1,
+      "text": "\"Earth rotates in space, highlighting the continent of Africa, then zooms into a lush African landscape featuring vibrant greenery and shimmering water bodies.\"",
+      "type": "Visual",
+      "start_time": 0.0
+    },
+    {
+      "scene_number": 2,
+      "text": "\"Sunlight pierces through thick forest leaves.\"",
+      "type": "Visual",
+      "start_time": 12.96
+    },
+    {
+      "scene_number": 2,
+      "text": "GOMBE NATIONAL PARK TANZANIA",
+      "type": "Text on Screen",
+      "start_time": 16.46
+    },
+    {
+      "scene_number": 2,
+      "text": "\"Mossy rock with delicate plants bathed in warm sunlight.\"",
+      "type": "Visual",
+      "start_time": 18.908
+    },
+    {
+      "scene_number": 2,
+      "text": "With words and narration by Jane Goodall",
+      "type": "Text on Screen",
+      "start_time": 23.66
+    },
+    {
+      "scene_number": 2,
+      "text": "\"Tall tree, forest.\"",
+      "type": "Visual",
+      "start_time": 26.612000000000002
+    },
+    {
+      "scene_number": 3,
+      "text": "Butterfly on leaf litter, wings spread; spider web glistens in sunlight.",
+      "type": "Visual",
+      "start_time": 37.02
+    },
+    {
+      "scene_number": 4,
+      "text": "\"Forest with green trees stretching to rolling hills.\"",
+      "type": "Visual",
+      "start_time": 50.04
+    },
+    {
+      "scene_number": 4,
+      "text": "\"Leaves close-up, insects in flight.\"",
+      "type": "Visual",
+      "start_time": 54.89
+    },
+    {
+      "scene_number": 4,
+      "text": "\"Chimpanzee swings through dense tree canopy, branches sway with its movement.\"",
+      "type": "Visual",
+      "start_time": 58.269999999999996
+    },
+    {
+      "scene_number": 5,
+      "text": "\"Chimpanzee clings to tree branch, arms stretched wide, among flying insects.\"",
+      "type": "Visual",
+      "start_time": 64.96
+    },
+    {
+      "scene_number": 5,
+      "text": "\"Chimpanzee's face, expressive eyes.\"",
+      "type": "Visual",
+      "start_time": 72.00999999999999
+    },
+    {
+      "scene_number": 6,
+      "text": "Chimpanzee grooms baby on forest floor.",
+      "type": "Visual",
+      "start_time": 79.08
+    },
+    {
+      "scene_number": 6,
+      "text": "\"Chimp ascends tree in forest.\"",
+      "type": "Visual",
+      "start_time": 85.82
+    },
+    {
+      "scene_number": 7,
+      "text": "\"Baboon crosses forest floor, another watches.\"",
+      "type": "Visual",
+      "start_time": 91.36
+    },
+    {
+      "scene_number": 7,
+      "text": "Yellow insect on leaf, green snake on mossy trunk.",
+      "type": "Visual",
+      "start_time": 103.36
+    },
+    {
+      "scene_number": 8,
+      "text": "\"Waterfall over cliffs, green foliage.\"",
+      "type": "Visual",
+      "start_time": 105.16
+    },
+    {
+      "scene_number": 8,
+      "text": "Black-winged butterflies with white spots flutter among green leaves; rolling hills, trees, and grass below; birds overhead.",
+      "type": "Visual",
+      "start_time": 116.03
+    },
+    {
+      "scene_number": 9,
+      "text": "\"Forest, trees; chimp peering through branches.\"",
+      "type": "Visual",
+      "start_time": 117.56
+    },
+    {
+      "scene_number": 9,
+      "text": "\"Close-up of baboons, highlighting detailed facial features.\"",
+      "type": "Visual",
+      "start_time": 123.56
+    },
+    {
+      "scene_number": 9,
+      "text": "White insect on leaf, antennae moving.",
+      "type": "Visual",
+      "start_time": 126.06
+    },
+    {
+      "scene_number": 10,
+      "text": "Ripples on dark lake, forested hills by calm sea.",
+      "type": "Visual",
+      "start_time": 134.88000000000002
+    },
+    {
+      "scene_number": 11,
+      "text": "\"Sunlight penetrates forest canopy.\"",
+      "type": "Visual",
+      "start_time": 138.4
+    },
+    {
+      "scene_number": 11,
+      "text": "Hello Gombe.",
+      "type": "Text on Screen",
+      "start_time": 145.94
+    },
+    {
+      "scene_number": 11,
+      "text": "Hello world.",
+      "type": "Text on Screen",
+      "start_time": 148.66
+    },
+    {
+      "scene_number": 12,
+      "text": "Google Maps\nExplore Gombe at g.co/treks",
+      "type": "Text on Screen",
+      "start_time": 150.52
+    },
+    {
+      "scene_number": 12,
+      "text": "Created in partnership with the Jane Goodall Institute\nLearn more at JaneGoodall.org",
+      "type": "Text on Screen",
+      "start_time": 153.52
+    },
+    {
+      "scene_number": 12,
+      "text": "Audio read by Jane Goodall\nfrom Reason for Hope: A Spiritual Journey\nby Jane Goodall with Phillip Berman",
+      "type": "Text on Screen",
+      "start_time": 156.52
+    },
+    {
+      "scene_number": 12,
+      "text": "Copyright © 1999 by Soko Publications Ltd. and Phillip Berman. Used by permission of Hachette Audio. All rights reserved worldwide.",
+      "type": "Text on Screen",
+      "start_time": 159.52
+    }
+  ],
+  "youtube_id": "_1DDhUnyvwY",
+  "video_name": "jane goodall",
+  "video_length": 147,
+  "aiUserId": "650506db3ff1c2140ea10ece"
+}

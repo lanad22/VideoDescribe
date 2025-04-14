@@ -1,11 +1,9 @@
-import os
 import json
 import difflib
 import subprocess
-import torch
-import librosa
-import numpy as np
+import argparse
 import whisper_timestamped
+import os
 import onnxruntime
 onnxruntime.set_default_logger_severity(3)
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -13,21 +11,17 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning, module="torch")
 
+from google.cloud import speech
 
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from dotenv import load_dotenv
+load_dotenv()
 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
-
-
+# Constants
 WHISPER_MODEL = "large-v3"
-WAV2VEC_MODEL = "facebook/wav2vec2-large-960h-lv60-self"
 
 def match_captions(scene_start, scene_end, scene_duration, captions):
-    """
-    Given scene boundaries and a list of captions (each with 'start', 'duration', and 'text'),
-    return a list of captions that substantially overlap with the scene.
-    The returned caption start and end times are relative to the scene start.
-    """
     scene_captions = []
     for caption in captions:
         cap_start = caption.get("start", 0)
@@ -54,7 +48,7 @@ def extract_audio(scene_video_path, output_audio_path):
         "-i", scene_video_path,
         "-vn",
         "-acodec", "pcm_s16le",
-        "-ar", "44100", #change from 16000
+        "-ar", "44100",
         "-ac", "1",
         output_audio_path
     ]
@@ -67,7 +61,6 @@ def extract_audio(scene_video_path, output_audio_path):
 def transcribe_whisper(wav_path, device="cuda"):
     """
     Transcribe the audio using Whisper via whisper_timestamped.
-    Returns a list of transcript segments (each with text, start, and end times).
     """
     print(f"Transcribing with Whisper on audio: {wav_path}")
     try:
@@ -78,7 +71,7 @@ def transcribe_whisper(wav_path, device="cuda"):
             vad="silero:v3.1",
             beam_size=10,
             best_of=5,
-            temperature=(0.0, 0.1, 0.2, 0.3, 0.4, 0.5)
+            temperature=(0.0, 0.1, 0.2, 0.4, 0.6, 0.8)
         )
         transcripts = []
         for segment in result["segments"]:
@@ -93,59 +86,165 @@ def transcribe_whisper(wav_path, device="cuda"):
         print(f"Error transcribing with Whisper: {str(e)}")
         return []
 
-def transcribe_wav2vec(wav_path, device="cuda"):
+def transcribe_google_speech(wav_path):
     """
-    Transcribe the given WAV file using Wav2Vec2.
-    Returns a list of transcript segments.
+    Transcribe the given WAV file using Google Speech-to-Text API.
     """
-    print(f"Transcribing with Wav2Vec2 on audio: {wav_path}")
+    print(f"Transcribing with Google Speech-to-Text on audio: {wav_path}")
     try:
-        processor = Wav2Vec2Processor.from_pretrained(WAV2VEC_MODEL)
-        model = Wav2Vec2ForCTC.from_pretrained(WAV2VEC_MODEL).to(device)
-    except Exception as e:
-        print(f"Error loading Wav2Vec2 model: {str(e)}")
-        return []
-    try:
-        speech_array, _ = librosa.load(wav_path, sr=16000)
-        chunk_size = 16000 * 60  # 60 seconds per chunk
+        client = speech.SpeechClient()
+
+        # Load audio data
+        with open(wav_path, "rb") as audio_file:
+            audio_content = audio_file.read()
+
+        audio = speech.RecognitionAudio(content=audio_content)
+
+        # Configure speech recognition request
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=44100,
+            language_code="en-US",
+            enable_word_time_offsets=True,
+            enable_automatic_punctuation=True,
+            model="video",  # Using video model for better results
+        )
+         # For longer audio, use long_running_recognize
+        file_size = os.path.getsize(wav_path) / (1024 * 1024)  # Size in MB
+
+        if file_size > 1:  # If file is larger than 1MB, use long-running recognition
+            print("Using long-running recognition due to file size...")
+            operation = client.long_running_recognize(config=config, audio=audio)
+            response = operation.result(timeout=90)
+        else:
+            response = client.recognize(config=config, audio=audio)
+
         transcripts = []
-        for i in range(0, len(speech_array), chunk_size):
-            chunk = speech_array[i : min(i + chunk_size, len(speech_array))]
-            inputs = processor(chunk, sampling_rate=16000, return_tensors="pt").to(device)
-            with torch.no_grad():
-                logits = model(inputs.input_values).logits
-            predicted_ids = torch.argmax(logits, dim=-1)
-            transcription = processor.batch_decode(predicted_ids)[0].lower().strip()
-            start_time = i / 16000.0
-            end_time = min(i + chunk_size, len(speech_array)) / 16000.0
-            transcripts.append({
-                "text": transcription,
-                "start": start_time,
-                "end": end_time
-            })
-        print(f"Wav2Vec2 transcription complete: {len(transcripts)} segments")
+        for result in response.results:
+            alternative = result.alternatives[0]
+
+            # Get start and end time from first and last word if available
+            if alternative.words:
+                first_word = alternative.words[0]
+                last_word = alternative.words[-1]
+                start_time = first_word.start_time.total_seconds()
+                end_time = last_word.end_time.total_seconds()
+
+                transcripts.append({
+                    "text": alternative.transcript.strip(),
+                    "start": start_time,
+                    "end": end_time
+                })
+
+        print(f"Google Speech-to-Text transcription complete: {len(transcripts)} segments")
         return transcripts
     except Exception as e:
-        print(f"Error during Wav2Vec2 transcription: {str(e)}")
+        print(f"Error during Google Speech-to-Text transcription: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
+def verify_transcriptions(whisper_transcripts, google_transcripts, similarity_threshold=0.95):
+    """
+    Verify Whisper transcripts using Google Speech-to-Text output.
+    When transcript texts are similar (>95%), use Google's timestamps with Whisper's text.
+    """
+    if not google_transcripts:
+        print("No Google Speech-to-Text segments found, discarding all Whisper segments")
         return []
 
-def verify_transcriptions(whisper_transcripts, wav2vec_transcripts):
-    """
-    Verify Whisper transcripts using Wav2Vec2 output.
-    If Wav2Vec2 returns no segments at all, then discard all Whisper segments.
-    Otherwise, for each Whisper segment, if there is no overlapping Wav2Vec2 segment,
-    the Whisper segment is discarded.
-    """
-    for wav_seg in wav2vec_transcripts:
-        if not wav_seg["text"]:
+    # Check if any Google segment has empty text
+    for google_seg in google_transcripts:
+        if not google_seg["text"]:
+            print("Empty text found in Google segments, discarding all Whisper segments")
             return []
+
     verified = []
+    
+    # For each Whisper segment, find matching Google segments
     for w_seg in whisper_transcripts:
-        has_overlap = any(w_seg["start"] < w2_seg["end"] and w_seg["end"] > w2_seg["start"] 
-                          for w2_seg in wav2vec_transcripts)
-        if has_overlap:
-            verified.append(w_seg)
-    return verified
+        whisper_text = w_seg["text"].lower().strip()
+        best_match_score = 0
+        best_match_google_seg = None
+        
+        # Find the best matching Google segment based on text similarity
+        for g_seg in google_transcripts:
+            google_text = g_seg["text"].lower().strip()
+            
+            # Skip empty segments
+            if not google_text or not whisper_text:
+                continue
+                
+            # Compute similarity between the two texts
+            similarity = difflib.SequenceMatcher(None, whisper_text, google_text).ratio()
+            
+            # If this is the best match so far, remember it
+            if similarity > best_match_score:
+                best_match_score = similarity
+                best_match_google_seg = g_seg
+        
+        # If we found a good match, use it
+        if best_match_score >= similarity_threshold and best_match_google_seg:
+            # Use Whisper's transcription text with Google's timestamps
+            verified.append({
+                "text": w_seg["text"].strip(),  # Keep Whisper's text
+                "start": best_match_google_seg["start"],  # Use Google's timestamps
+                "end": best_match_google_seg["end"],
+                "similarity": best_match_score,  # Keep track of the match quality
+                "source": "hybrid"  # Mark as a hybrid of Whisper text + Google timestamps
+            })
+            print(f"Using hybrid segment (similarity: {best_match_score:.2f}): {w_seg['text']}")
+        elif any(w_seg["start"] < g_seg["end"] and w_seg["end"] > g_seg["start"] for g_seg in google_transcripts):
+            # There's some overlap with Google segments, but not high similarity
+            # Keep Whisper's text and timestamps, but mark it as verified
+            verified.append({
+                "text": w_seg["text"].strip(),
+                "start": w_seg["start"],
+                "end": w_seg["end"],
+                "source": "whisper_verified"
+            })
+    
+    # Track which Google segments were used in hybrid matches
+    google_used = [False] * len(google_transcripts)
+    
+    # Mark Google segments that overlap with verified segments as used
+    for v_seg in verified:
+        for i, g_seg in enumerate(google_transcripts):
+            if v_seg["start"] < g_seg["end"] and v_seg["end"] > g_seg["start"]:
+                google_used[i] = True
+    
+    # Add high-confidence Google segments that don't overlap with any verified segment
+    for i, g_seg in enumerate(google_transcripts):
+        if not google_used[i] and g_seg.get("confidence", 0) > 0.9:  # 90% confidence threshold
+            high_confidence_segment = {
+                "text": g_seg["text"],
+                "start": g_seg["start"],
+                "end": g_seg["end"],
+                "source": "google_high_confidence"
+            }
+            verified.append(high_confidence_segment)
+            print(f"Adding high-confidence Google segment: {g_seg['text']}")
+    
+    # Sort verified segments by start time
+    verified.sort(key=lambda x: x["start"])
+    
+    # Merge or filter overlapping segments
+    filtered_verified = []
+    if verified:
+        current_segment = verified[0]
+        for next_segment in verified[1:]:
+            # If segments overlap significantly
+            if next_segment["start"] < current_segment["end"]:
+                # If the next segment is longer, or if it's a hybrid and current isn't
+                if (next_segment["end"] - next_segment["start"] > current_segment["end"] - current_segment["start"]) or \
+                   (next_segment.get("source") == "hybrid" and current_segment.get("source") != "hybrid"):
+                    current_segment = next_segment
+            else:
+                filtered_verified.append(current_segment)
+                current_segment = next_segment
+        filtered_verified.append(current_segment)
+    
+    print(f"Verification complete: {len(filtered_verified)} segments total")
+    return filtered_verified
 
 def should_discard_captions(global_transcript_text, global_caption_text, threshold=0.8):
     """
@@ -159,7 +258,7 @@ def should_discard_captions(global_transcript_text, global_caption_text, thresho
 def update_scene_transcripts(video_folder, device="cuda", verification_threshold=0.6, global_caption_threshold=0.8):
     video_id = os.path.basename(os.path.normpath(video_folder))
     scene_json_path = os.path.join(video_folder, f"{video_id}_scenes", "scene_info.json")
-    
+
     if not os.path.exists(scene_json_path):
         print(f"Scene JSON file not found: {scene_json_path}")
         return
@@ -178,9 +277,8 @@ def update_scene_transcripts(video_folder, device="cuda", verification_threshold
                 print(f"Loaded {len(captions)} captions from {captions_path}")
         except Exception as e:
             print(f"Error loading captions: {str(e)}")
-    
+
     global_transcript_text = ""
-    
     # Process each scene to update transcripts and build global transcript text
     for scene in scenes:
         scene_path = scene.get("scene_path", "")
@@ -195,9 +293,10 @@ def update_scene_transcripts(video_folder, device="cuda", verification_threshold
         # Transcribe with both models and verify
         whisper_trans = transcribe_whisper(temp_audio_path, device)
         print(f"WHISPER TRANS: {whisper_trans}")
-        wav2vec_trans = transcribe_wav2vec(temp_audio_path, device)
-        print(f"WAV2VEC2 TRANS: {wav2vec_trans}")
-        verified_trans = verify_transcriptions(whisper_trans, wav2vec_trans)
+        # Use Google Speech-to-Text instead of Wav2Vec2
+        google_trans = transcribe_google_speech(temp_audio_path)
+        print(f"GOOGLE SPEECH TRANS: {google_trans}")
+        verified_trans = verify_transcriptions(whisper_trans, google_trans)
         scene["transcript"] = verified_trans
 
         # Append the scene transcript text to the global transcript text
@@ -231,22 +330,29 @@ def update_scene_transcripts(video_folder, device="cuda", verification_threshold
         # No captions available or transcript text is empty
         for scene in scenes:
             scene["captions"] = []
-    
+
     with open(scene_json_path, "w") as out_f:
         json.dump(scenes, out_f, indent=2)
     print(f"Updated scene JSON with transcripts saved to: {scene_json_path}")
-
+    
 if __name__ == "__main__":
-    import argparse
     parser = argparse.ArgumentParser(
-        description="Transcribe scene audio using Whisper and Wav2Vec2, verify transcripts, and update scene JSON with optional captions."
+        description="Transcribe scene audio using Whisper and Google Speech-to-Text, verify transcripts, and update scene JSON with optional captions."
     )
     parser.add_argument("video_folder", type=str,
-                        help="Path to the video folder (e.g., videos/video_id). The scene_info.json file is expected at videos/video_id/video_id_scenes_new/scene_info.json")
+                        help="Path to the video folder (e.g., videos/video_id). The scene_info.json file is expected at videos/video_id/video_id_scenes/scene_info.json")
     parser.add_argument("--device", type=str, default="cuda",
-                        help="Device to use for transcription (default: cuda)")
+                        help="Device to use for Whisper transcription (default: cuda)")
     parser.add_argument("--threshold", type=float, default=0.6,
                         help="Similarity threshold for transcription verification (default: 0.6)")
-    
+
     args = parser.parse_args()
     update_scene_transcripts(args.video_folder, args.device, args.threshold)
+                
+    
+
+
+
+
+
+    

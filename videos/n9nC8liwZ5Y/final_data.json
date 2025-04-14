@@ -1,0 +1,210 @@
+{
+  "dialogue_timestamps": [
+    {
+      "start_time": 0.43,
+      "end_time": 11.5,
+      "duration": 11.07,
+      "sequence_num": 1
+    },
+    {
+      "start_time": 23.949583333333333,
+      "end_time": 31.669583333333332,
+      "duration": 7.72,
+      "sequence_num": 2
+    },
+    {
+      "start_time": 46.41525,
+      "end_time": 46.655249999999995,
+      "duration": 0.24,
+      "sequence_num": 3
+    },
+    {
+      "start_time": 48.663375,
+      "end_time": 49.723375,
+      "duration": 1.06,
+      "sequence_num": 4
+    },
+    {
+      "start_time": 79.48395833333333,
+      "end_time": 83.66395833333333,
+      "duration": 4.18,
+      "sequence_num": 5
+    },
+    {
+      "start_time": 291.19537499999996,
+      "end_time": 298.395375,
+      "duration": 7.2,
+      "sequence_num": 6
+    },
+    {
+      "start_time": 310.7905416666666,
+      "end_time": 310.81054166666667,
+      "duration": 0.02,
+      "sequence_num": 7
+    },
+    {
+      "start_time": 322.65566666666666,
+      "end_time": 323.2556666666667,
+      "duration": 0.6,
+      "sequence_num": 8
+    },
+    {
+      "start_time": 338.963625,
+      "end_time": 347.943625,
+      "duration": 8.98,
+      "sequence_num": 9
+    }
+  ],
+  "audio_clips": [
+    {
+      "scene_number": 2,
+      "text": "Peter navigates through a dense crowd at night, pushing past people as he moves urgently down the street.",
+      "type": "Visual",
+      "start_time": 11.886875
+    },
+    {
+      "scene_number": 3,
+      "text": "\"Peter kneels by Uncle Ben, crowd forms.\"",
+      "type": "Visual",
+      "start_time": 31.669583333333332
+    },
+    {
+      "scene_number": 4,
+      "text": "Uncle Ben's face shows signs of struggle and pain, his eyes flicker as he tries to speak, conveying urgency.",
+      "type": "Visual",
+      "start_time": 35.28525
+    },
+    {
+      "scene_number": 5,
+      "text": "\"Peter, tears in eyes, rushes to Uncle Ben, lying on the sidewalk. Kneeling, he holds Uncle Ben’s hand as he struggles to breathe, face in pain.\"",
+      "type": "Visual",
+      "start_time": 49.723375
+    },
+    {
+      "scene_number": 6,
+      "text": "Peter, visibly distressed, stands with bystanders nearby. He looks around frantically as Uncle Ben's hand grips his tightly before letting go. The scene shifts back to Peter, tears streaming down his face.",
+      "type": "Visual",
+      "start_time": 62.35395833333333
+    },
+    {
+      "scene_number": 6,
+      "text": "\"Peter's face shows grief then filled with determination.\"",
+      "type": "Visual",
+      "start_time": 83.66395833333333
+    },
+    {
+      "scene_number": 8,
+      "text": "Peter, in Spider-Man's suit, sprints through the alley, leaps onto a wall, and scales it with agility. The camera tracks his swift climb, then his swing out into the night, landing on a rooftop.",
+      "type": "Visual",
+      "start_time": 98.84875
+    },
+    {
+      "scene_number": 9,
+      "text": "Spider-Man climbs down a building, leaps off, and swings through the city streets at night.",
+      "type": "Visual",
+      "start_time": 114.23912499999999
+    },
+    {
+      "scene_number": 10,
+      "text": "\"Spider-Man swings through the city, lands on a rooftop, and crouches to survey the illuminated street below.\"",
+      "type": "Visual",
+      "start_time": 127.46066666666665
+    },
+    {
+      "scene_number": 11,
+      "text": "Spider-Man leaps from rooftop, swinging through dark city streets. He navigates between buildings with agility, his red and blue suit contrasting against the night. The camera follows his swift movements as he propels himself forward",
+      "type": "Visual",
+      "start_time": 138.38825
+      
+    },
+    {
+      "scene_number": 12,
+      "text": "Spider-Man swings between towering buildings, using web lines to propel himself forward with precision and speed.",
+      "type": "Visual",
+      "start_time": 165.24841666666666
+      
+    },
+    {
+      "scene_number": 13,
+      "text": "Spider-Man flips over a car, landing on another. Inside a speeding police car, rain-soaked streets flash by with lights.",
+      "type": "Visual",
+      "start_time": 181.30612499999998
+    },
+    {
+      "scene_number": 15,
+      "text": "Spider-Man grips a man's head in a car, then pulls him out through the window. Night city street with wet roads and heavy traffic.",
+      "type": "Visual",
+      "start_time": 202.78591666666665
+    },
+    {
+      "scene_number": 17,
+      "text": "\"Spider-Man leaps onto a Carlsberg truck, swings off, and dives between buildings.\"",
+      "type": "Visual",
+      "start_time": 222.847625
+    },
+    {
+      "scene_number": 18,
+      "text": "Spider-Man uses web to trap car, police arrive at scene under bridge.",
+      "type": "Visual",
+      "start_time": 232.98274999999998
+    },
+    {
+      "scene_number": 19,
+      "text": "A man in a dark room, holding a gun, points it upwards as he looks around cautiously. The environment is dimly lit with debris scattered on the floor and broken windows letting in faint light. He appears tense and alert.",
+      "type": "Visual",
+      "start_time": 246.49624999999997
+    },
+    {
+      "scene_number": 20,
+      "text": "Spider-Man battles a man in a dark industrial setting. He overpowers and slams him against a metal door, then throws him into a cage. Spider-Man stands over the now-restrained assailant.",
+      "type": "Visual",
+      "start_time": 275.35841666666664
+    },
+    {
+      "scene_number": 21,
+      "text": "\"Spider-Man faces the scared, restrained man.\"",
+      "type": "Visual",
+      "start_time": 298.395375
+    },
+    {
+      "scene_number": 22,
+      "text": "\"Spider-Man's eyes widen; a masked man lunges with a knife. Scene turns black and white as he dodges.\"",
+      "type": "Visual",
+      "start_time": 302.51054166666665
+    },
+    {
+      "scene_number": 22,
+      "text": "\"Spider-Man stunned; man runs.\"",
+      "type": "Visual",
+      "start_time": 310.81054166666667
+    },
+    {
+      "scene_number": 23,
+      "text": "\"Spider-Man, in civilian clothes, faces a masked man with a gun in a dim room. He remains calm.\"",
+      "type": "Visual",
+      "start_time": 312.6039583333333
+    },
+    {
+      "scene_number": 24,
+      "text": "\"Spider-Man swings in, grabs the masked man, they struggle near a window. Spider-Man pushes him out, he crashes through windows, landing on a rooftop.\"",
+      "type": "Visual",
+      "start_time": 323.2556666666667
+    },
+    {
+      "scene_number": 25,
+      "text": "\"Spider-Man watches police searchlights scan the area.\"",
+      "type": "Visual",
+      "start_time": 347.943625
+    },
+    {
+      "scene_number": 26,
+      "text": "Police officers with flashlights cautiously enter a dimly lit building, their beams cutting through the darkness. They move silently, checking corners and windows, as tension builds in the shadowy environment.",
+      "type": "Visual",
+      "start_time": 353.72837499999997
+    }
+  ],
+  "youtube_id": "n9nC8liwZ5Y",
+  "video_name": "Uncle Ben's Death Vengeance Scene - Spider-Man (2002)",
+  "video_length": 377,
+  "aiUserId": "650506db3ff1c2140ea10ece"
+}
