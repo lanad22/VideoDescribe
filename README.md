@@ -80,7 +80,7 @@ Downloads the YouTube video and its captions.
 
 **Output:**  
 - `videos/<video_id>/<video_id>.mp4`  
-- `videos/<video_id>/<video_id>.json` (captions)
+- `videos/<video_id>/<video_id>.json` (metadata)
 
 ---
 
@@ -131,7 +131,7 @@ Generates context-aware descriptions using Qwen2.5-VL.
 - `scene_info.json` with:
 ```json
 "audio_clips": [
-  {"type": "Visual", "start_time": 0.0, "text": "Description of scene"}
+  {"type": "Visual", "start_time": 0.0, "text": "Description of scene..."}
 ]
 ```
 
