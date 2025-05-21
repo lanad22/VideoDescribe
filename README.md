@@ -8,6 +8,9 @@ YouDescribe is one of the few community-driven platforms addressing this gap—a
 
 Creating AD is time-consuming and creative—it’s not just a task but a form of storytelling. This project presents a VLM-driven, automated AD pipeline enhanced with context-aware prompting, AD guideline adherence, and a human-in-the-loop (HITL) design to support volunteer efforts and improve quality.
 
+📄 **Read our CHIWORK 2025 Late-Breaking Work Paper**:  
+[**YouDescribe: Bridging AI Efficiency and Human Insight for Scalable Audio Description (PDF)**](papers/YouDescribe_CHIWORK2025_LBW.pdf)
+
 ## Project Overview
 This system generates contextually rich, scalable audio descriptions for YouTube videos using a combination of scene segmentation, transcription, and vision-language models (Qwen2.5-VL). It supports:
 
@@ -31,7 +34,7 @@ This empowers BLV users with greater **agency and interactivity**, transforming 
 
 ## System Architecture
 
-![System Diagram](diagram.png)
+![System Diagram](papers/diagram.png)
 
 ---
 
